@@ -98,6 +98,21 @@ def create_board():
     if board_name:
         return redirect(f"/board/{board_name}")
     return redirect("/")
+@app.route("/delete_board/<int:board_id>", methods=["POST"])
+def delete_board(board_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    # 投稿（posts）を削除
+    cur.execute("DELETE FROM posts WHERE board_id = ?", (board_id,))
+
+    # 板（boards）を削除
+    cur.execute("DELETE FROM boards WHERE id = ?", (board_id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
 
 
 if __name__ == "__main__":

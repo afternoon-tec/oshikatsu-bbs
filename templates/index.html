@@ -3,7 +3,12 @@
 <h2>📋 板一覧</h2>
 <ul>
   {% for b in boards %}
-    <li><a href="/board/{{ b.id }}">{{ b.name }}</a> - {{ b.description }}</li>
+    <li><a href="/board/{{ b.id }}">{{ b.name }}</a> - {{ b.description }}
+      <form action="/delete_board/{{ board.id }}" method="POST" style="display:inline;">
+        <button type="submit" class="delete-btn" onclick="return confirm('本当に削除しますか？');">🗑 削除</button>
+      </form>
+      
+    </li>
   {% else %}
     <p>まだ板がありません。</p>
   {% endfor %}
