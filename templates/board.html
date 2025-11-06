@@ -1,43 +1,49 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ board }}板</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <header>
-    <h1>{{ board }}板</h1>
-    <p><a href="/">← 板一覧へ戻る</a></p>
-  </header>
+{% extends "layout.html" %}
+{% block content %}
 
-  <div class="container">
-    <div class="form-box">
-      <form method="POST" enctype="multipart/form-data">
-        <label>名前（任意）:</label>
-        <input type="text" name="name" placeholder="名無しさん">
-        <label>コメント:</label>
-        <textarea name="message" rows="3" required></textarea>
-        <label>画像（任意）:</label>
-        <input type="file" name="image" accept="image/*">
-        <button type="submit">投稿する</button>
-      </form>
-    </div>
+<h2>📌 {{ board.title }}</h2>
+{% if board.description %}
+  <p class="description">{{ board.description }}</p>
+{% endif %}
 
+<!-- 投稿フォーム -->
+<div class="form-box">
+  <form method="POST" enctype="multipart/form-data">
+    <label>名前（任意）:</label>
+    <input type="text" name="name" placeholder="名無しさん">
+
+    <label>コメント:</label>
+    <textarea name="message" rows="3" required></textarea>
+
+    <label>画像（任意）:</label>
+    <input type="file" name="image" accept="image/*">
+
+    <button type="submit">投稿する</button>
+  </form>
+</div>
+
+<hr>
+
+<!-- 投稿一覧 -->
+{% if posts %}
+  <div class="posts">
     {% for post in posts %}
-    <div class="post">
-      <strong>{{ post['name'] }}</strong> <span class="date">({{ post['date'] }})</span>
-      <div class="message">{{ post['message'] }}</div>
-      {% if post['image'] %}
-        <div class="image-box">
-          <img src="{{ url_for('static', filename=post['image'].split('static/')[-1]) }}" alt="画像" loading="lazy">
-        </div>
-      {% endif %}
-    </div>
+      <div class="post">
+        <p><strong>{{ post["name"] or "名無しさん" }}</strong> 🕓 {{ post["date"] }}</p>
+        <p>{{ post["message"] | e }}</p>
+
+        {% if post["image"] %}
+          <img src="{{ url_for('static', filename='uploads/' + post['image']) }}" alt="投稿画像" class="post-image">
+        {% endif %}
+      </div>
     {% endfor %}
   </div>
+{% else %}
+  <p>まだ投稿がありません。</p>
+{% endif %}
 
-  <footer>© 推し活掲示板</footer>
-</body>
-</html>
+<a href="{{ url_for('boards') }}" class="back-btn">← 板一覧に戻る</a>
+
+{% endblock %}
+
 
