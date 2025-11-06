@@ -1,31 +1,19 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>💬 推し活掲示板 💬</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "layout.html" %}
+{% block content %}
+<h2>📋 板一覧</h2>
+<ul>
+  {% for b in boards %}
+    <li><a href="/board/{{ b.id }}">{{ b.name }}</a> - {{ b.description }}</li>
+  {% else %}
+    <p>まだ板がありません。</p>
+  {% endfor %}
+</ul>
 
-<h1>💬 推し活掲示板 💬</h1>
-
-<div class="form-box">
-  <form method="POST">
-    <label>名前（任意）:</label>
-    <input type="text" name="name" placeholder="名無しさん">
-    <label>コメント:</label>
-    <textarea name="message" rows="3" required></textarea>
-    <button type="submit">投稿する</button>
-  </form>
-</div>
-
-{% for p in posts %}
-<div class="post-box">
-  <p><strong>{{ p.name or "名無しさん" }}</strong>（{{ p.date }}）</p>
-  <p>{{ p.message }}</p>
-</div>
-{% endfor %}
-
-</body>
-</html>
+<h3>＋ 新しい板を作る</h3>
+<form action="/create_board" method="POST">
+  <input type="text" name="name" placeholder="板の名前" required>
+  <input type="text" name="description" placeholder="説明（任意）">
+  <button type="submit">作成</button>
+</form>
+{% endblock %}
 

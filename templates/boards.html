@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>掲示板一覧</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>🌸 推し活掲示板 🌸</h1></header>
+
+  <div class="container">
+    <h2>板一覧</h2>
+
+    {% if boards %}
+      <ul>
+        {% for b in boards %}
+          <li><a href="{{ url_for('board', board=b) }}">{{ b }}</a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>まだ板がありません。</p>
+    {% endif %}
+
+    <form method="POST" action="/create" class="form-box">
+      <label>新しい板を作る：</label>
+      <input type="text" name="board" placeholder="例：推しのライブについて">
+      <button type="submit">作成</button>
+    </form>
+  </div>
+
+  <footer>© 推し活掲示板</footer>
+</body>
+</html>
