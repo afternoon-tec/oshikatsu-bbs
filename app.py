@@ -6,16 +6,21 @@ from datetime import datetime
 app = Flask(__name__)
 DB = "bbs.db"
 
+# --- データベース接続関数 ---
+def get_db():
+    conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
 # --- データベース初期化関数 ---
 def init_db():
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-    c.execute("""
+    conn = get_db()
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             message TEXT NOT NULL,
-            date TEXT NOT NULL
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
@@ -24,29 +29,7 @@ def init_db():
 # --- Flask起動時に自動実行 ---
 init_db()
 
-
-# データベース接続
-def get_db():
-    conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-# 初回用：テーブル作成
-def init_db():
-    if not os.path.exists(DB):
-        conn = get_db()
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS posts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                message TEXT NOT NULL,
-                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        conn.commit()
-        conn.close()
-
-# 掲示板トップ
+# --- 掲示板トップページ ---
 @app.route("/", methods=["GET", "POST"])
 def index():
     conn = get_db()
@@ -66,5 +49,5 @@ def index():
     return render_template("index.html", posts=posts)
 
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
+
