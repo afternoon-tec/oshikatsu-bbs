@@ -53,6 +53,10 @@ def init_db():
     conn.close()
 
 
+# ✅ Renderでも常に実行されるようにここで呼ぶ
+init_db()
+
+
 # --- DB接続 ---
 def get_db():
     conn = sqlite3.connect(DB)
@@ -136,7 +140,5 @@ def board(board_id):
 
 # --- 起動 ---
 if __name__ == "__main__":
-    init_db()
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
 
