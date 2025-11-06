@@ -9,6 +9,11 @@ app = Flask(__name__)
 DB = "bbs.db"
 UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+app = Flask(__name__)
+DB = "bbs.db"
+
+# 画像アップロードフォルダを自動作成
+os.makedirs("static/uploads", exist_ok=True)
 
 # アップロード設定
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
