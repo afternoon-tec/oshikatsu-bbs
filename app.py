@@ -1,9 +1,29 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 DB = "bbs.db"
+
+# --- データベース初期化関数 ---
+def init_db():
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            message TEXT NOT NULL,
+            date TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+# --- Flask起動時に自動実行 ---
+init_db()
+
 
 # データベース接続
 def get_db():
