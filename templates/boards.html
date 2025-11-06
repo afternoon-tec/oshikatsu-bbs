@@ -1,33 +1,30 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>掲示板一覧</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <header><h1>🌸 推し活掲示板 🌸</h1></header>
+{% extends "layout.html" %}
+{% block content %}
+<h2>📋 板一覧</h2>
 
-  <div class="container">
-    <h2>板一覧</h2>
+{% if boards %}
+  <ul>
+    {% for board in boards %}
+      <li>
+        <a href="/board/{{ board.id }}">{{ board.title }}</a>
+        {% if board.description %}
+          <p class="description">{{ board.description }}</p>
+        {% endif %}
+        <form action="/delete_board/{{ board.id }}" method="POST" style="display:inline;">
+          <button type="submit" class="delete-btn" onclick="return confirm('本当に削除しますか？');">🗑</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>まだ板がありません。</p>
+{% endif %}
 
-    {% if boards %}
-      <ul>
-        {% for b in boards %}
-          <li><a href="{{ url_for('board', board=b) }}">{{ b }}</a></li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>まだ板がありません。</p>
-    {% endif %}
+<h3>＋ 新しい板を作る</h3>
+<form action="/create_board" method="POST">
+  <input type="text" name="name" placeholder="板の名前" required>
+  <input type="text" name="description" placeholder="説明（任意）">
+  <button type="submit">作成</button>
+</form>
+{% endblock %}
 
-    <form method="POST" action="/create" class="form-box">
-      <label>新しい板を作る：</label>
-      <input type="text" name="board" placeholder="例：推しのライブについて">
-      <button type="submit">作成</button>
-    </form>
-  </div>
-
-  <footer>© 推し活掲示板</footer>
-</body>
-</html>

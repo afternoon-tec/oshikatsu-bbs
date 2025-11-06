@@ -4,42 +4,54 @@ import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
+# --- Flask設定 ---
 app = Flask(__name__)
 
 DB = "bbs.db"
 UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-app = Flask(__name__)
-DB = "bbs.db"
 
-# 画像アップロードフォルダを自動作成
-os.makedirs("static/uploads", exist_ok=True)
-
-# アップロード設定
+# 画像フォルダを自動作成
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# --- 画像の拡張子チェック ---
+
+# --- 拡張子チェック ---
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # --- データベース初期化 ---
 def init_db():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
+
+    # 板テーブル
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS boards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT UNIQUE NOT NULL,
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # 投稿テーブル
     c.execute("""
         CREATE TABLE IF NOT EXISTS posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            board TEXT NOT NULL,
+            board_id INTEGER NOT NULL,
             name TEXT,
             message TEXT NOT NULL,
             image TEXT,
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(board_id) REFERENCES boards(id) ON DELETE CASCADE
         )
     """)
+
     conn.commit()
     conn.close()
 
-init_db()
 
 # --- DB接続 ---
 def get_db():
@@ -53,18 +65,45 @@ def get_db():
 def boards():
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT DISTINCT board FROM posts ORDER BY board;")
-    boards = [row["board"] for row in cur.fetchall()]
+    cur.execute("SELECT * FROM boards ORDER BY created_at DESC;")
+    boards = cur.fetchall()
     conn.close()
     return render_template("boards.html", boards=boards)
 
 
-# --- 板ページ ---
-@app.route("/board/<board>", methods=["GET", "POST"])
-def board(board):
+# --- 新しい板を作る ---
+@app.route("/create_board", methods=["POST"])
+def create_board():
+    name = request.form["name"].strip()
+    description = request.form.get("description", "")
+    if name:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO boards (title, description) VALUES (?, ?)", (name, description))
+        conn.commit()
+        conn.close()
+    return redirect("/")
+
+
+# --- 板を削除する ---
+@app.route("/delete_board/<int:board_id>", methods=["POST"])
+def delete_board(board_id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM posts WHERE board_id = ?", (board_id,))
+    cur.execute("DELETE FROM boards WHERE id = ?", (board_id,))
+    conn.commit()
+    conn.close()
+    return redirect("/")
+
+
+# --- 各板ページ ---
+@app.route("/board/<int:board_id>", methods=["GET", "POST"])
+def board(board_id):
     conn = get_db()
     cur = conn.cursor()
 
+    # 投稿処理
     if request.method == "POST":
         name = request.form.get("name", "名無しさん")
         message = request.form["message"]
@@ -80,42 +119,24 @@ def board(board):
                 image_path = f"{UPLOAD_FOLDER}/{filename}"
 
         if message.strip():
-            cur.execute("INSERT INTO posts (board, name, message, image) VALUES (?, ?, ?, ?)",
-                        (board, name, message, image_path))
+            cur.execute("INSERT INTO posts (board_id, name, message, image) VALUES (?, ?, ?, ?)",
+                        (board_id, name, message, image_path))
             conn.commit()
 
-    cur.execute("SELECT * FROM posts WHERE board=? ORDER BY date DESC;", (board,))
-    posts = cur.fetchall()
-    conn.close()
+    # 板情報と投稿を取得
+    cur.execute("SELECT * FROM boards WHERE id = ?", (board_id,))
+    board = cur.fetchone()
 
+    cur.execute("SELECT * FROM posts WHERE board_id = ? ORDER BY date DESC;", (board_id,))
+    posts = cur.fetchall()
+
+    conn.close()
     return render_template("board.html", board=board, posts=posts)
 
 
-# --- 新しい板を作る ---
-@app.route("/create", methods=["POST"])
-def create_board():
-    board_name = request.form["board"].strip()
-    if board_name:
-        return redirect(f"/board/{board_name}")
-    return redirect("/")
-@app.route("/delete_board/<int:board_id>", methods=["POST"])
-def delete_board(board_id):
-    conn = get_db()
-    cur = conn.cursor()
-
-    # 投稿（posts）を削除
-    cur.execute("DELETE FROM posts WHERE board_id = ?", (board_id,))
-
-    # 板（boards）を削除
-    cur.execute("DELETE FROM boards WHERE id = ?", (board_id,))
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/")
-
-
+# --- 起動 ---
 if __name__ == "__main__":
+    init_db()
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
 
