@@ -6,11 +6,11 @@
   <ul>
     {% for board in boards %}
       <li>
-        <a href="/board/{{ board.id }}">{{ board.title }}</a>
+        <a href="{{ url_for('board', board_id=board.id) }}">{{ board.title }}</a>
         {% if board.description %}
           <p class="description">{{ board.description }}</p>
         {% endif %}
-        <form action="/delete_board/{{ board.id }}" method="POST" style="display:inline;">
+        <form action="{{ url_for('delete_board', board_id=board.id) }}" method="POST" style="display:inline;">
           <button type="submit" class="delete-btn" onclick="return confirm('本当に削除しますか？');">🗑</button>
         </form>
       </li>
@@ -21,10 +21,11 @@
 {% endif %}
 
 <h3>＋ 新しい板を作る</h3>
-<form action="/create_board" method="POST">
+<form action="{{ url_for('create_board') }}" method="POST">
   <input type="text" name="name" placeholder="板の名前" required>
   <input type="text" name="description" placeholder="説明（任意）">
   <button type="submit">作成</button>
 </form>
 {% endblock %}
+
 
