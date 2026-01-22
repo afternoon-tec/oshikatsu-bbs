@@ -1,19 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <h2>📋 板一覧</h2>
 <ul>
   {% for board in boards %}
     <li>
       <a href="/board/{{ board.title }}">{{ board.title }}</a>
 
-      <!-- 🔽 削除ボタン追加 -->
       <form action="/delete_board/{{ board.id }}" method="POST" style="display:inline;">
-        <button type="submit" class="delete-btn" onclick="return confirm('本当に削除しますか？');">🗑</button>
+        <button type="submit" class="delete-btn"
+                onclick="return confirm('本当に削除しますか？');">🗑</button>
       </form>
     </li>
   {% endfor %}
 </ul>
-
 
 <h3>＋ 新しい板を作る</h3>
 <form action="/create_board" method="POST">
@@ -21,11 +21,14 @@
   <input type="text" name="description" placeholder="説明（任意）">
   <button type="submit">作成</button>
 </form>
-{% endblock %}
+
+<!-- 🔽 ここに入れる！ -->
 <div style="margin-top:20px;">
   <a href="{{ url_for('index') }}" style="text-decoration:none;">
-    <button style="padding:8px 16px; cursor:pointer;">
+    <button type="button" style="padding:8px 16px; cursor:pointer;">
       🏠 トップに戻る
     </button>
   </a>
 </div>
+
+{% endblock %}
