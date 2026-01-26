@@ -4,11 +4,42 @@ body {
   color: #333;
   margin: 20px;
 }
-h1 a { text-decoration: none; color: #e91e63; }
-.post { border: 1px solid #f8c; background: #fff0f7; padding: 10px; margin: 10px 0; border-radius: 8px; }
-button { background: #e91e63; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-button:hover { background: #d81b60; }
-input, textarea { width: 100%; margin-bottom: 8px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+
+h1 a {
+  text-decoration: none;
+  color: #e91e63;
+}
+
+.post {
+  border: 1px solid #f8c;
+  background: #fff0f7;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+button {
+  background: #e91e63;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #d81b60;
+}
+
+input,
+textarea {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .image-box {
   margin-top: 10px;
 }
@@ -16,8 +47,9 @@ input, textarea { width: 100%; margin-bottom: 8px; padding: 6px; border: 1px sol
 .image-box img {
   max-width: 200px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
 .delete-btn {
   background: #f44336;
   color: white;
@@ -27,7 +59,53 @@ input, textarea { width: 100%; margin-bottom: 8px; padding: 6px; border: 1px sol
   margin-left: 8px;
   cursor: pointer;
 }
+
 .delete-btn:hover {
   background: #d32f2f;
 }
 
+/* =========================
+   🍞 パンくずナビ（スマホ対応＋推し活カラー）
+   ========================= */
+
+.breadcrumb {
+  margin: 12px auto;
+  padding: 8px 12px;
+  max-width: 900px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.breadcrumb a {
+  color: #e91e63;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: #aaa;
+}
+
+.breadcrumb .current {
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* 📱 スマホ専用微調整 */
+@media (max-width: 600px) {
+  .breadcrumb {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
