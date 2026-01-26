@@ -10,11 +10,21 @@
 
   <header>
     <h1>
-      <a href="{{ url_for('boards') }}" style="text-decoration:none; color:inherit;">
+      <a href="https://24aa0054.thick.jp/oshilog/" style="text-decoration:none; color:inherit;">
         💖 推し活掲示板 💖
       </a>
     </h1>
   </header>
+<!-- 🍞 パンくずナビ -->
+<nav class="breadcrumb">
+  <a href="https://24aa0054.thick.jp/oshilog/">推し活サイト</a>
+  <span>›</span>
+  <a href="{{ url_for('boards') }}">掲示板</a>
+  {% if board %}
+    <span>›</span>
+    <span class="current">{{ board.title }}</span>
+  {% endif %}
+</nav>
 
   <main>
     {% block content %}{% endblock %}
@@ -22,12 +32,13 @@
 
   <!-- 🔽 共通：トップに戻るボタン -->
   <div style="margin: 20px; text-align: center;">
-    <a href="{{ url_for('boards') }}" style="text-decoration:none;">
+    <a href="https://24aa0054.thick.jp/oshilog/" style="text-decoration:none;">
       <button type="button" style="padding:8px 16px; cursor:pointer;">
-        🏠 トップに戻る
+        🏠 推し活サイトへ戻る
       </button>
     </a>
   </div>
+  
 
   <footer style="text-align:center; margin: 2em 0; font-size: 0.9em; color: #777;">
     &copy; 2025 推し活掲示板
